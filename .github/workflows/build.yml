@@ -1,0 +1,24 @@
+on:
+  push:
+    tags:
+      - "v**"
+jobs:
+  upload:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSVC Developer Command Prompt
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install numpy with no CPU optimizations
+        run: |
+          python -m pip wheel --no-binary numpy numpy -Csetup-args=-Ddisable-optimization="true" --no-cache-dir
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: "*.whl"
